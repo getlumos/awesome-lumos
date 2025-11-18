@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+target/
+node_modules/
+dist/
+build/
+*.vsix
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Anchor
+.anchor/
+test-ledger/
+.program-keypairs/
+
+# Solana
+*.so
+deploy/
+
+# Generated files (examples should commit generated LUMOS code for documentation)
+# But ignore temporary build artifacts
+*.rs.backup
+*.ts.backup
