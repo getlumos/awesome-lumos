@@ -1,7 +1,7 @@
 # CLAUDE.md - Awesome LUMOS
 
 **Repository:** https://github.com/getlumos/awesome-lumos
-**Website:** https://lumos-lang.com
+**Website:** https://lumos-lang.org
 **Purpose:** Curated collection of LUMOS examples, tutorials, and community projects
 
 ---
