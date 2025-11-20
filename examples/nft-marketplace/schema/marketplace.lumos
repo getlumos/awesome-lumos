@@ -1,0 +1,90 @@
+// NFT Marketplace Schema
+// Generated types for a decentralized NFT marketplace on Solana
+
+// ============================================================================
+// Marketplace Configuration
+// ============================================================================
+
+#[solana]
+#[account]
+struct MarketplaceConfig {
+    authority: PublicKey,
+    fee_percentage: u16,
+    treasury: PublicKey,
+    total_sales: u64,
+    is_paused: bool,
+}
+
+// ============================================================================
+// NFT Listing
+// ============================================================================
+
+#[solana]
+#[account]
+struct Listing {
+    seller: PublicKey,
+    nft_mint: PublicKey,
+    price: u64,
+    listed_at: i64,
+    status: ListingStatus,
+    buyer: Option<PublicKey>,
+    sold_at: Option<i64>,
+}
+
+#[solana]
+enum ListingStatus {
+    Active,
+    Sold,
+    Cancelled,
+}
+
+// ============================================================================
+// NFT Metadata
+// ============================================================================
+
+#[solana]
+#[account]
+struct NFTMetadata {
+    name: String,
+    symbol: String,
+    uri: String,
+    creator: PublicKey,
+    collection: Option<PublicKey>,
+    royalty_percentage: u16,
+}
+
+// ============================================================================
+// Transaction History
+// ============================================================================
+
+#[solana]
+struct TransactionRecord {
+    transaction_type: TransactionType,
+    nft_mint: PublicKey,
+    from: PublicKey,
+    to: PublicKey,
+    price: u64,
+    timestamp: i64,
+}
+
+#[solana]
+enum TransactionType {
+    Listed,
+    Sold,
+    Cancelled,
+    PriceUpdated { old_price: u64, new_price: u64 },
+}
+
+// ============================================================================
+// User Profile (Optional - tracks user activity)
+// ============================================================================
+
+#[solana]
+#[account]
+struct UserProfile {
+    owner: PublicKey,
+    total_listed: u64,
+    total_sold: u64,
+    total_purchased: u64,
+    joined_at: i64,
+}
