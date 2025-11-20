@@ -1,0 +1,111 @@
+// DeFi Staking Schema
+// Generated types for a flexible staking protocol on Solana
+// Supports multiple pools, flexible rewards, lock periods, and emergency controls
+
+#[solana]
+#[account]
+struct StakingPool {
+    authority: PublicKey,
+    token_mint: PublicKey,
+    vault: PublicKey,
+    total_staked: u64,
+    total_stakers: u64,
+    reward_rate: u64,
+    min_stake_amount: u64,
+    min_lock_duration: i64,
+    cooldown_period: i64,
+    is_active: bool,
+    created_at: i64,
+}
+
+#[solana]
+#[account]
+struct StakeAccount {
+    owner: PublicKey,
+    pool: PublicKey,
+    amount: u64,
+    staked_at: i64,
+    last_claim_at: i64,
+    unlock_at: i64,
+    total_claimed: u64,
+    status: StakingStatus,
+    unstake_requested_at: Option<i64>,
+}
+
+#[solana]
+enum StakingStatus {
+    Active,
+    Locked,
+    UnstakeRequested,
+    Unstaked,
+}
+
+#[solana]
+#[account]
+struct RewardConfig {
+    pool: PublicKey,
+    calculation_type: RewardCalculationType,
+    base_apy: u64,
+    bonus_multiplier: u64,
+    max_apy: u64,
+    compound_frequency: i64,
+}
+
+#[solana]
+enum RewardCalculationType {
+    FixedAPY,
+    TieredAPY {
+        tier1_amount: u64,
+        tier1_apy: u64,
+        tier2_amount: u64,
+        tier2_apy: u64,
+        tier3_apy: u64,
+    },
+    DynamicAPY {
+        min_apy: u64,
+        max_apy: u64,
+        utilization_threshold: u64,
+    },
+}
+
+#[solana]
+struct StakingEvent {
+    event_type: EventType,
+    user: PublicKey,
+    pool: PublicKey,
+    amount: u64,
+    timestamp: i64,
+    block_height: u64,
+}
+
+#[solana]
+enum EventType {
+    Staked,
+    Unstaked,
+    RewardClaimed { reward_amount: u64 },
+    UnstakeRequested,
+    EmergencyWithdraw { penalty: u64 },
+    LockExtended { new_unlock_time: i64 },
+}
+
+#[solana]
+#[account]
+struct UserStakingStats {
+    owner: PublicKey,
+    total_staked_lifetime: u64,
+    total_rewards_claimed: u64,
+    total_pools_participated: u64,
+    first_stake_at: i64,
+    last_activity_at: i64,
+}
+
+#[solana]
+#[account]
+struct PoolStats {
+    pool: PublicKey,
+    total_rewards_distributed: u64,
+    average_stake_duration: i64,
+    highest_stake: u64,
+    current_apy: u64,
+    last_updated: i64,
+}
