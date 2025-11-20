@@ -1,0 +1,154 @@
+// Token Vesting Schema
+// Generated types for a comprehensive token vesting system
+// Supports linear vesting, cliffs, milestones, and revocation
+
+#[solana]
+#[account]
+struct VestingPool {
+    authority: PublicKey,
+    token_mint: PublicKey,
+    vault: PublicKey,
+    name: String,
+    total_schedules: u64,
+    total_allocated: u64,
+    total_released: u64,
+    total_revoked: u64,
+    is_active: bool,
+    created_at: i64,
+}
+
+#[solana]
+#[account]
+struct VestingSchedule {
+    pool: PublicKey,
+    beneficiary: PublicKey,
+    vesting_type: VestingType,
+    total_amount: u64,
+    released_amount: u64,
+    start_time: i64,
+    end_time: i64,
+    cliff_time: Option<i64>,
+    last_release_time: i64,
+    is_revocable: bool,
+    is_revoked: bool,
+    revoked_at: Option<i64>,
+    created_at: i64,
+}
+
+#[solana]
+enum VestingType {
+    Linear,
+    Cliff {
+        cliff_duration: i64,
+    },
+    CliffLinear {
+        cliff_duration: i64,
+        cliff_percentage: u64,
+    },
+    Milestone {
+        milestones: Vec<Milestone>,
+    },
+}
+
+#[solana]
+struct Milestone {
+    unlock_time: i64,
+    percentage: u64,
+    is_unlocked: bool,
+}
+
+#[solana]
+#[account]
+struct ReleaseRecord {
+    schedule: PublicKey,
+    beneficiary: PublicKey,
+    amount: u64,
+    released_at: i64,
+    cumulative_released: u64,
+}
+
+#[solana]
+#[account]
+struct Beneficiary {
+    wallet: PublicKey,
+    pool: PublicKey,
+    total_allocated: u64,
+    total_released: u64,
+    total_revoked: u64,
+    schedules_count: u64,
+    first_vesting_at: i64,
+    last_release_at: i64,
+}
+
+#[solana]
+#[account]
+struct RevocationRecord {
+    schedule: PublicKey,
+    beneficiary: PublicKey,
+    amount_vested: u64,
+    amount_revoked: u64,
+    revoked_by: PublicKey,
+    revoked_at: i64,
+    reason: String,
+}
+
+#[solana]
+struct VestingEvent {
+    event_type: EventType,
+    pool: PublicKey,
+    beneficiary: PublicKey,
+    amount: u64,
+    timestamp: i64,
+    block_height: u64,
+}
+
+#[solana]
+enum EventType {
+    PoolCreated,
+    ScheduleCreated {
+        schedule_id: PublicKey,
+        vesting_type: VestingType,
+        total_amount: u64,
+    },
+    TokensReleased {
+        schedule_id: PublicKey,
+        amount: u64,
+    },
+    ScheduleRevoked {
+        schedule_id: PublicKey,
+        amount_revoked: u64,
+    },
+    MilestoneUnlocked {
+        schedule_id: PublicKey,
+        milestone_index: u64,
+    },
+    BeneficiaryUpdated {
+        old_beneficiary: PublicKey,
+        new_beneficiary: PublicKey,
+    },
+}
+
+#[solana]
+#[account]
+struct PoolStats {
+    pool: PublicKey,
+    total_beneficiaries: u64,
+    average_vesting_duration: i64,
+    largest_allocation: u64,
+    total_cliffs_passed: u64,
+    total_milestones_unlocked: u64,
+    completion_rate: u64,
+    last_updated: i64,
+}
+
+#[solana]
+#[account]
+struct BeneficiaryStats {
+    beneficiary: PublicKey,
+    pool: PublicKey,
+    vesting_progress: u64,
+    days_until_next_release: i64,
+    estimated_monthly_release: u64,
+    total_schedules_completed: u64,
+    average_release_interval: i64,
+}
