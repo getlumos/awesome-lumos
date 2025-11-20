@@ -1,0 +1,167 @@
+// DAO Governance Schema
+// Generated types for a comprehensive on-chain governance system
+// Supports proposals, voting, delegation, timelock, and treasury management
+
+#[solana]
+#[account]
+struct DAO {
+    authority: PublicKey,
+    name: String,
+    treasury: PublicKey,
+    total_members: u64,
+    total_proposals: u64,
+    voting_period: i64,
+    timelock_delay: i64,
+    quorum_threshold: u64,
+    approval_threshold: u64,
+    is_active: bool,
+    created_at: i64,
+}
+
+#[solana]
+#[account]
+struct Proposal {
+    id: u64,
+    dao: PublicKey,
+    proposer: PublicKey,
+    title: String,
+    description: String,
+    proposal_type: ProposalType,
+    yes_votes: u64,
+    no_votes: u64,
+    abstain_votes: u64,
+    total_votes: u64,
+    start_time: i64,
+    end_time: i64,
+    queued_at: Option<i64>,
+    executed_at: Option<i64>,
+    cancelled_at: Option<i64>,
+    status: ProposalStatus,
+}
+
+#[solana]
+enum ProposalType {
+    Transfer {
+        recipient: PublicKey,
+        amount: u64,
+    },
+    ConfigChange {
+        voting_period: Option<i64>,
+        timelock_delay: Option<i64>,
+        quorum_threshold: Option<u64>,
+        approval_threshold: Option<u64>,
+    },
+    AddMember {
+        member: PublicKey,
+        voting_power: u64,
+    },
+    RemoveMember {
+        member: PublicKey,
+    },
+    Custom {
+        instruction_data: String,
+        target_program: PublicKey,
+    },
+}
+
+#[solana]
+enum ProposalStatus {
+    Draft,
+    Active,
+    Succeeded,
+    Defeated,
+    Queued,
+    Executed,
+    Cancelled,
+    Expired,
+}
+
+#[solana]
+#[account]
+struct Vote {
+    proposal: PublicKey,
+    voter: PublicKey,
+    vote_type: VoteType,
+    voting_power: u64,
+    comment: String,
+    voted_at: i64,
+}
+
+#[solana]
+enum VoteType {
+    Yes,
+    No,
+    Abstain,
+}
+
+#[solana]
+#[account]
+struct Member {
+    dao: PublicKey,
+    wallet: PublicKey,
+    voting_power: u64,
+    delegate: Option<PublicKey>,
+    proposals_created: u64,
+    votes_cast: u64,
+    joined_at: i64,
+    is_active: bool,
+}
+
+#[solana]
+#[account]
+struct VoteDelegation {
+    delegator: PublicKey,
+    delegatee: PublicKey,
+    dao: PublicKey,
+    delegated_power: u64,
+    created_at: i64,
+}
+
+#[solana]
+struct GovernanceEvent {
+    event_type: EventType,
+    dao: PublicKey,
+    actor: PublicKey,
+    timestamp: i64,
+    block_height: u64,
+}
+
+#[solana]
+enum EventType {
+    DAOCreated,
+    ProposalCreated { proposal_id: u64 },
+    VoteCast { proposal_id: u64, vote_type: VoteType },
+    ProposalQueued { proposal_id: u64 },
+    ProposalExecuted { proposal_id: u64 },
+    ProposalCancelled { proposal_id: u64 },
+    MemberAdded { member: PublicKey },
+    MemberRemoved { member: PublicKey },
+    VoteDelegated { from: PublicKey, to: PublicKey },
+    ConfigChanged,
+}
+
+#[solana]
+#[account]
+struct DAOStats {
+    dao: PublicKey,
+    total_votes_cast: u64,
+    total_proposals_passed: u64,
+    total_proposals_failed: u64,
+    total_treasury_spent: u64,
+    average_participation_rate: u64,
+    last_activity_at: i64,
+}
+
+#[solana]
+#[account]
+struct MemberStats {
+    member: PublicKey,
+    dao: PublicKey,
+    total_proposals_created: u64,
+    total_votes_cast: u64,
+    proposals_passed: u64,
+    proposals_failed: u64,
+    voting_power_received: u64,
+    voting_power_delegated: u64,
+    participation_rate: u64,
+}
