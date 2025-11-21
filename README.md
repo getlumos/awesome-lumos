@@ -1,6 +1,8 @@
 # Awesome LUMOS ✨
 
-> Curated collection of awesome LUMOS examples, full-stack applications, tutorials, and community projects for Solana development.
+> **Write once. Deploy Everywhere.**
+
+Curated collection of awesome LUMOS examples, full-stack applications, tutorials, and community projects for Solana development.
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 [![LUMOS](https://img.shields.io/badge/LUMOS-Type--Safe%20Solana-9945FF.svg)](https://github.com/getlumos/lumos)
