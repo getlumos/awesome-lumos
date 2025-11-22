@@ -1,94 +1,45 @@
 # CLAUDE.md - Awesome LUMOS
 
-**Repository:** https://github.com/getlumos/awesome-lumos
-**Website:** https://lumos-lang.org
-**Purpose:** Production-ready LUMOS examples and community projects
+> **Ecosystem Context:** See [getlumos/lumos/CLAUDE.md](https://github.com/getlumos/lumos/blob/main/CLAUDE.md) for LUMOS ecosystem overview, cross-repo standards, and shared guidelines.
 
 ---
 
-## Current Examples (5 Complete)
+## Examples
 
-| Example | Types | Instructions | Features | Path |
-|---------|-------|--------------|----------|------|
-| **NFT Marketplace** | 7 | 9 | Fixed/auction listings, bidding, royalties | `examples/nft-marketplace/` |
-| **DeFi Staking** | 9 | 7 | Fixed/tiered/dynamic APY, cooldown, compound | `examples/defi-staking/` |
-| **DAO Governance** | 12 | 9 | Proposals, voting, quorum, timelock | `examples/dao-governance/` |
-| **Gaming Inventory** | 14 | 11 | Player progression, crafting, 6 rarities | `examples/gaming-inventory/` |
-| **Token Vesting** | 11 | 6 | Linear/cliff/milestone vesting, revocation | `examples/token-vesting/` |
+| Example | Types | Instructions | Path |
+|---------|-------|--------------|------|
+| NFT Marketplace | 7 | 9 | `examples/nft-marketplace/` |
+| DeFi Staking | 9 | 7 | `examples/defi-staking/` |
+| DAO Governance | 12 | 9 | `examples/dao-governance/` |
+| Gaming Inventory | 14 | 11 | `examples/gaming-inventory/` |
+| Token Vesting | 11 | 6 | `examples/token-vesting/` |
 
-**Total:** 53 types, 42 instructions, 4000+ LOC of type-safe Solana code
+**Total:** 53 types, 42 instructions, 4000+ LOC
 
 ---
 
-## Structure
+## Example Structure
 
 ```
-awesome-lumos/
-├── examples/          # 5 complete full-stack examples
-│   ├── nft-marketplace/
-│   ├── defi-staking/
-│   ├── dao-governance/
-│   ├── gaming-inventory/
-│   └── token-vesting/
-├── tutorials/         # Step-by-step guides (open for contributions)
-├── templates/         # Project starters (open for contributions)
-├── README.md
-└── CONTRIBUTING.md
+examples/[name]/
+├── schema.lumos      # Source of truth
+├── generated.rs/.ts  # Generated code
+├── programs/         # Anchor program
+└── client/           # TypeScript client
 ```
-
-Each example includes:
-- `.lumos` schema (source of truth)
-- Generated Rust + TypeScript
-- Working Anchor program
-- TypeScript client with helpers
-- Comprehensive README
-
----
-
-## Key Learnings
-
-**Type Synchronization:** All examples demonstrate zero type mismatches between Rust/TypeScript via LUMOS generation.
-
-**Common Patterns:**
-- Complex enums with data (VestingType, ProposalType, ItemType)
-- Calculation parity (on-chain and client match exactly)
-- Context-aware generation (Anchor vs Borsh)
-- Option/Vec types correctly mapped
-
-**Development Speed:** 3-4x faster type definition, 100% elimination of type mismatch bugs.
 
 ---
 
 ## Contributing
 
-### Full Example Requirements
+**Requirements:**
 - Complete `.lumos` schema
-- Working Anchor program (compiles)
-- TypeScript client
-- Tests passing
+- Working Anchor program (`anchor build`)
+- TypeScript client with tests
 - Comprehensive README
 - MIT or Apache 2.0 license
 
-### Review Criteria
-Code quality, documentation completeness, tests passing, security, license compatibility, adds value.
-
 ---
 
-## AI Assistant Guidelines
-
-**DO:** Survey existing examples, test before submitting, maintain consistent formatting, update README.md.
-
-**DON'T:** Add incomplete examples, submit untested code, duplicate existing examples, skip documentation.
-
----
-
-## Related Repositories
-
-- **lumos** - Core library and CLI
-- **vscode-lumos** - VSCode extension
-- **docs-lumos** - Official docs (lumos-lang.org)
-
----
-
-**Last Updated:** 2025-11-20
+**Last Updated:** 2025-11-22
 **Status:** 5 production-ready examples available
