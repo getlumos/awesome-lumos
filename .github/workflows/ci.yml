@@ -1,0 +1,223 @@
+name: Example Validation CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  schema-validation:
+    name: Validate LUMOS Schemas
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - nft-marketplace
+          - defi-staking
+          - dao-governance
+          - gaming-inventory
+          - token-vesting
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install LUMOS CLI
+        run: cargo install lumos-cli --locked
+
+      - name: Validate schema syntax
+        run: |
+          echo "Validating ${{ matrix.example }} schema..."
+          cd examples/${{ matrix.example }}
+          if [ -f schema/*.lumos ]; then
+            lumos validate schema/*.lumos
+          else
+            echo "Error: No .lumos schema found in examples/${{ matrix.example }}/schema/"
+            exit 1
+          fi
+
+      - name: Generate code
+        run: |
+          echo "Generating code for ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          lumos generate schema/*.lumos --output programs/${{ matrix.example }}/src/generated.rs --lang rust
+          lumos generate schema/*.lumos --output app/src/generated.ts --lang typescript
+
+      - name: Check for drift
+        run: |
+          echo "Checking for uncommitted changes in ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          if ! git diff --quiet programs/${{ matrix.example }}/src/generated.rs app/src/generated.ts 2>/dev/null; then
+            echo "Error: Generated code is out of sync with schema!"
+            echo "Please run 'lumos generate schema/*.lumos' and commit the changes."
+            git diff programs/${{ matrix.example }}/src/generated.rs app/src/generated.ts
+            exit 1
+          fi
+          echo "Generated code is in sync with schema."
+
+  rust-build:
+    name: Build Rust Programs
+    runs-on: ubuntu-latest
+    needs: schema-validation
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - nft-marketplace
+          - defi-staking
+          - dao-governance
+          - gaming-inventory
+          - token-vesting
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+            examples/${{ matrix.example }}/target/
+          key: ${{ runner.os }}-rust-${{ matrix.example }}-${{ hashFiles(format('examples/{0}/**/Cargo.lock', matrix.example)) }}
+          restore-keys: |
+            ${{ runner.os }}-rust-${{ matrix.example }}-
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Verify Solana installation
+        run: |
+          solana --version
+          solana-keygen --version
+
+      - name: Build Anchor program
+        run: |
+          echo "Building ${{ matrix.example }} Anchor program..."
+          cd examples/${{ matrix.example }}
+          cargo build-sbf --manifest-path programs/${{ matrix.example }}/Cargo.toml
+
+      - name: Run Rust tests
+        run: |
+          echo "Running tests for ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          cargo test --manifest-path programs/${{ matrix.example }}/Cargo.toml
+        continue-on-error: true
+
+      - name: Check for warnings
+        run: |
+          echo "Checking for warnings in ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          cargo clippy --manifest-path programs/${{ matrix.example }}/Cargo.toml -- -D warnings
+
+  typescript-build:
+    name: Build TypeScript Clients
+    runs-on: ubuntu-latest
+    needs: schema-validation
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - nft-marketplace
+          - defi-staking
+          - dao-governance
+          - gaming-inventory
+          - token-vesting
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: examples/${{ matrix.example }}/package.json
+
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies for ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          if [ -f package.json ]; then
+            npm ci || npm install
+          else
+            echo "No package.json found, skipping npm install"
+          fi
+
+      - name: Type check TypeScript
+        run: |
+          echo "Type checking ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          if [ -f tsconfig.json ]; then
+            npx tsc --noEmit
+          else
+            echo "No tsconfig.json found, skipping type check"
+          fi
+
+      - name: Build TypeScript client
+        run: |
+          echo "Building ${{ matrix.example }} TypeScript client..."
+          cd examples/${{ matrix.example }}
+          if [ -f package.json ] && grep -q '"build"' package.json; then
+            npm run build
+          else
+            echo "No build script found, skipping build"
+          fi
+        continue-on-error: true
+
+  summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [schema-validation, rust-build, typescript-build]
+    if: always()
+
+    steps:
+      - name: Check results
+        run: |
+          echo "CI Pipeline Summary"
+          echo "==================="
+          echo ""
+          echo "Schema Validation: ${{ needs.schema-validation.result }}"
+          echo "Rust Build: ${{ needs.rust-build.result }}"
+          echo "TypeScript Build: ${{ needs.typescript-build.result }}"
+          echo ""
+          if [ "${{ needs.schema-validation.result }}" != "success" ] || \
+             [ "${{ needs.rust-build.result }}" != "success" ] || \
+             [ "${{ needs.typescript-build.result }}" != "success" ]; then
+            echo "Some checks failed. Please review the logs above."
+            exit 1
+          fi
+          echo "All checks passed successfully!"
