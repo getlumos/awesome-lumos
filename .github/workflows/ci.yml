@@ -52,19 +52,26 @@ jobs:
         run: |
           echo "Validating ${{ matrix.example }} schema..."
           cd examples/${{ matrix.example }}
-          if [ -f schema/*.lumos ]; then
-            lumos validate schema/*.lumos
-          else
+          SCHEMA_FILE=$(ls schema/*.lumos 2>/dev/null | head -n 1)
+          if [ -z "$SCHEMA_FILE" ]; then
             echo "Error: No .lumos schema found in examples/${{ matrix.example }}/schema/"
             exit 1
           fi
+          lumos validate "$SCHEMA_FILE"
 
-      - name: Generate code
+      - name: Generate Rust code
         run: |
-          echo "Generating code for ${{ matrix.example }}..."
+          echo "Generating Rust code for ${{ matrix.example }}..."
           cd examples/${{ matrix.example }}
-          lumos generate schema/*.lumos --output programs/${{ matrix.example }}/src/generated.rs --lang rust
-          lumos generate schema/*.lumos --output app/src/generated.ts --lang typescript
+          SCHEMA_FILE=$(ls schema/*.lumos | head -n 1)
+          lumos generate "$SCHEMA_FILE" --output programs/${{ matrix.example }}/src
+
+      - name: Generate TypeScript code
+        run: |
+          echo "Generating TypeScript code for ${{ matrix.example }}..."
+          cd examples/${{ matrix.example }}
+          SCHEMA_FILE=$(ls schema/*.lumos | head -n 1)
+          lumos generate "$SCHEMA_FILE" --output app/src
 
       - name: Check for drift
         run: |
@@ -72,7 +79,7 @@ jobs:
           cd examples/${{ matrix.example }}
           if ! git diff --quiet programs/${{ matrix.example }}/src/generated.rs app/src/generated.ts 2>/dev/null; then
             echo "Error: Generated code is out of sync with schema!"
-            echo "Please run 'lumos generate schema/*.lumos' and commit the changes."
+            echo "Please run 'lumos generate schema/<name>.lumos --output programs/${{ matrix.example }}/src' and commit the changes."
             git diff programs/${{ matrix.example }}/src/generated.rs app/src/generated.ts
             exit 1
           fi
