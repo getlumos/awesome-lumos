@@ -127,19 +127,21 @@ jobs:
 
       - name: Install Solana CLI
         run: |
-          sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)"
+          sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)" || {
+            echo "First attempt failed, retrying..."
+            sleep 5
+            sh -c "$(curl -sSfL https://release.solana.com/v1.18.18/install)"
+          }
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
       - name: Verify Solana installation
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           solana --version
           solana-keygen --version
 
       - name: Build Anchor program
         run: |
           echo "Building ${{ matrix.example }} Anchor program..."
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           cd examples/${{ matrix.example }}
           cargo build-sbf --manifest-path programs/${{ matrix.example }}/Cargo.toml
 
@@ -178,8 +180,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: examples/${{ matrix.example }}/package.json
 
       - name: Install dependencies
         run: |
