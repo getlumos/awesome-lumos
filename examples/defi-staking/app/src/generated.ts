@@ -8,13 +8,48 @@ export interface StakingPool {
   authority: PublicKey;
   token_mint: PublicKey;
   vault: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_staked: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_stakers: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   reward_rate: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   min_stake_amount: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   min_lock_duration: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   cooldown_period: number;
   is_active: boolean;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   created_at: number;
 }
 
@@ -36,12 +71,42 @@ export const StakingPoolSchema = borsh.struct([
 export interface StakeAccount {
   owner: PublicKey;
   pool: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   amount: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   staked_at: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   last_claim_at: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   unlock_at: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_claimed: number;
   status: StakingStatus;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   unstake_requested_at?: number | undefined;
 }
 
@@ -53,7 +118,7 @@ export const StakeAccountSchema = borsh.struct([
   borsh.i64('last_claim_at'),
   borsh.i64('unlock_at'),
   borsh.u64('total_claimed'),
-  borsh.stakingstatus('status'),
+  StakingStatusSchema('status'),
   borsh.option(borsh.i64)('unstake_requested_at'),
 ]);
 
@@ -76,15 +141,35 @@ export const StakingStatusSchema = borsh.rustEnum([
 export interface RewardConfig {
   pool: PublicKey;
   calculation_type: RewardCalculationType;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   base_apy: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   bonus_multiplier: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   max_apy: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   compound_frequency: number;
 }
 
 export const RewardConfigSchema = borsh.struct([
   borsh.publicKey('pool'),
-  borsh.rewardcalculationtype('calculation_type'),
+  RewardCalculationTypeSchema('calculation_type'),
   borsh.u64('base_apy'),
   borsh.u64('bonus_multiplier'),
   borsh.u64('max_apy'),
@@ -92,6 +177,10 @@ export const RewardConfigSchema = borsh.struct([
 ]);
 
 
+/**
+ * WARNING: Some variants contain TypeScript 'number' types with precision limit of 2^53-1.
+ * Large values (e.g., Solana lamports) may lose precision during serialization.
+ */
 export type RewardCalculationType =
   | { kind: 'FixedAPY' }
   | { kind: 'TieredAPY'; tier1_amount: number; tier1_apy: number; tier2_amount: number; tier2_apy: number; tier3_apy: number }
@@ -119,13 +208,28 @@ export interface StakingEvent {
   event_type: EventType;
   user: PublicKey;
   pool: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   amount: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   timestamp: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   block_height: number;
 }
 
 export const StakingEventSchema = borsh.struct([
-  borsh.eventtype('event_type'),
+  EventTypeSchema('event_type'),
   borsh.publicKey('user'),
   borsh.publicKey('pool'),
   borsh.u64('amount'),
@@ -134,6 +238,10 @@ export const StakingEventSchema = borsh.struct([
 ]);
 
 
+/**
+ * WARNING: Some variants contain TypeScript 'number' types with precision limit of 2^53-1.
+ * Large values (e.g., Solana lamports) may lose precision during serialization.
+ */
 export type EventType =
   | { kind: 'Staked' }
   | { kind: 'Unstaked' }
@@ -161,10 +269,35 @@ export const EventTypeSchema = borsh.rustEnum([
 
 export interface UserStakingStats {
   owner: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_staked_lifetime: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_rewards_claimed: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_pools_participated: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   first_stake_at: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   last_activity_at: number;
 }
 
@@ -180,10 +313,35 @@ export const UserStakingStatsSchema = borsh.struct([
 
 export interface PoolStats {
   pool: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_rewards_distributed: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   average_stake_duration: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   highest_stake: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   current_apy: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   last_updated: number;
 }
 

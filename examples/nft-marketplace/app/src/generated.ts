@@ -8,6 +8,11 @@ export interface MarketplaceConfig {
   authority: PublicKey;
   fee_percentage: number;
   treasury: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_sales: number;
   is_paused: boolean;
 }
@@ -24,10 +29,25 @@ export const MarketplaceConfigSchema = borsh.struct([
 export interface Listing {
   seller: PublicKey;
   nft_mint: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   price: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   listed_at: number;
   status: ListingStatus;
   buyer?: PublicKey | undefined;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   sold_at?: number | undefined;
 }
 
@@ -36,7 +56,7 @@ export const ListingSchema = borsh.struct([
   borsh.publicKey('nft_mint'),
   borsh.u64('price'),
   borsh.i64('listed_at'),
-  borsh.listingstatus('status'),
+  ListingStatusSchema('status'),
   borsh.option(borsh.publicKey)('buyer'),
   borsh.option(borsh.i64)('sold_at'),
 ]);
@@ -79,12 +99,22 @@ export interface TransactionRecord {
   nft_mint: PublicKey;
   from: PublicKey;
   to: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   price: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   timestamp: number;
 }
 
 export const TransactionRecordSchema = borsh.struct([
-  borsh.transactiontype('transaction_type'),
+  TransactionTypeSchema('transaction_type'),
   borsh.publicKey('nft_mint'),
   borsh.publicKey('from'),
   borsh.publicKey('to'),
@@ -93,6 +123,10 @@ export const TransactionRecordSchema = borsh.struct([
 ]);
 
 
+/**
+ * WARNING: Some variants contain TypeScript 'number' types with precision limit of 2^53-1.
+ * Large values (e.g., Solana lamports) may lose precision during serialization.
+ */
 export type TransactionType =
   | { kind: 'Listed' }
   | { kind: 'Sold' }
@@ -113,9 +147,29 @@ export const TransactionTypeSchema = borsh.rustEnum([
 
 export interface UserProfile {
   owner: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_listed: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_sold: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_purchased: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   joined_at: number;
 }
 

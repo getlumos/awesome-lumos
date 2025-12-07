@@ -75,7 +75,7 @@ struct CraftingRecipe {
     result_rarity: Rarity,
     result_power: u32,
     required_level: u16,
-    required_materials: Vec<MaterialRequirement>,
+    required_materials: [MaterialRequirement],
     crafting_cost: u64,
     success_rate: u8,
 }

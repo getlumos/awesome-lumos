@@ -46,7 +46,7 @@ enum VestingType {
         cliff_percentage: u64,
     },
     Milestone {
-        milestones: Vec<Milestone>,
+        milestones: [Milestone],
     },
 }
 

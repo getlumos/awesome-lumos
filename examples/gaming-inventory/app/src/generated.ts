@@ -8,16 +8,46 @@ export interface Player {
   wallet: PublicKey;
   username: string;
   level: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   experience: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   gold: number;
   health: number;
   mana: number;
   equipped_weapon?: PublicKey | undefined;
   equipped_armor?: PublicKey | undefined;
   equipped_accessory?: PublicKey | undefined;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_items_owned: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_monsters_defeated: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   created_at: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   last_login: number;
 }
 
@@ -40,6 +70,11 @@ export const PlayerSchema = borsh.struct([
 
 
 export interface GameItem {
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   id: number;
   owner: PublicKey;
   name: string;
@@ -52,6 +87,11 @@ export interface GameItem {
   max_durability: number;
   is_equipped: boolean;
   is_tradeable: boolean;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   created_at: number;
 }
 
@@ -59,8 +99,8 @@ export const GameItemSchema = borsh.struct([
   borsh.u64('id'),
   borsh.publicKey('owner'),
   borsh.string('name'),
-  borsh.itemtype('item_type'),
-  borsh.rarity('rarity'),
+  ItemTypeSchema('item_type'),
+  RaritySchema('rarity'),
   borsh.u16('level_requirement'),
   borsh.u32('power'),
   borsh.u32('defense'),
@@ -94,7 +134,7 @@ export const ItemTypeSchema = borsh.rustEnum([
     borsh.u32('luck_bonus'),
   ], 'Accessory'),
   borsh.struct([
-    borsh.consumableeffect('effect'),
+    ConsumableEffectSchema('effect'),
     borsh.u32('uses'),
   ], 'Consumable'),
   borsh.struct([
@@ -103,6 +143,10 @@ export const ItemTypeSchema = borsh.rustEnum([
 ]);
 
 
+/**
+ * WARNING: Some variants contain TypeScript 'number' types with precision limit of 2^53-1.
+ * Large values (e.g., Solana lamports) may lose precision during serialization.
+ */
 export type ConsumableEffect =
   | { kind: 'HealHealth'; amount: number }
   | { kind: 'RestoreMana'; amount: number }
@@ -148,13 +192,23 @@ export const RaritySchema = borsh.rustEnum([
 
 
 export interface CraftingRecipe {
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   id: number;
   name: string;
   result_item_type: ItemType;
   result_rarity: Rarity;
   result_power: number;
   required_level: number;
-  required_materials: Vec;
+  required_materials: MaterialRequirement[];
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   crafting_cost: number;
   success_rate: number;
 }
@@ -162,11 +216,11 @@ export interface CraftingRecipe {
 export const CraftingRecipeSchema = borsh.struct([
   borsh.u64('id'),
   borsh.string('name'),
-  borsh.itemtype('result_item_type'),
-  borsh.rarity('result_rarity'),
+  ItemTypeSchema('result_item_type'),
+  RaritySchema('result_rarity'),
   borsh.u32('result_power'),
   borsh.u16('required_level'),
-  borsh.vec('required_materials'),
+  borsh.vec(MaterialRequirementSchema)('required_materials'),
   borsh.u64('crafting_cost'),
   borsh.u8('success_rate'),
 ]);
@@ -184,15 +238,35 @@ export const MaterialRequirementSchema = borsh.struct([
 
 
 export interface TradeOffer {
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   id: number;
   offerer: PublicKey;
   offered_item: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   requested_gold?: number | undefined;
   requested_item_type?: ItemType | undefined;
   requested_min_rarity?: Rarity | undefined;
   recipient?: PublicKey | undefined;
   status: TradeStatus;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   created_at: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   expires_at: number;
 }
 
@@ -201,10 +275,10 @@ export const TradeOfferSchema = borsh.struct([
   borsh.publicKey('offerer'),
   borsh.publicKey('offered_item'),
   borsh.option(borsh.u64)('requested_gold'),
-  borsh.option(borsh.itemtype)('requested_item_type'),
-  borsh.option(borsh.rarity)('requested_min_rarity'),
+  borsh.option(ItemTypeSchema)('requested_item_type'),
+  borsh.option(RaritySchema)('requested_min_rarity'),
   borsh.option(borsh.publicKey)('recipient'),
-  borsh.tradestatus('status'),
+  TradeStatusSchema('status'),
   borsh.i64('created_at'),
   borsh.i64('expires_at'),
 ]);
@@ -228,18 +302,27 @@ export const TradeStatusSchema = borsh.rustEnum([
 export interface Achievement {
   player: PublicKey;
   achievement_type: AchievementType;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   unlocked_at: number;
   reward_claimed: boolean;
 }
 
 export const AchievementSchema = borsh.struct([
   borsh.publicKey('player'),
-  borsh.achievementtype('achievement_type'),
+  AchievementTypeSchema('achievement_type'),
   borsh.i64('unlocked_at'),
   borsh.bool('reward_claimed'),
 ]);
 
 
+/**
+ * WARNING: Some variants contain TypeScript 'number' types with precision limit of 2^53-1.
+ * Large values (e.g., Solana lamports) may lose precision during serialization.
+ */
 export type AchievementType =
   | { kind: 'ReachLevel'; level: number }
   | { kind: 'DefeatMonsters'; count: number }
@@ -257,7 +340,7 @@ export const AchievementTypeSchema = borsh.rustEnum([
     borsh.u64('count'),
   ], 'DefeatMonsters'),
   borsh.struct([
-    borsh.rarity('rarity'),
+    RaritySchema('rarity'),
     borsh.u64('count'),
   ], 'CollectItems'),
   borsh.struct([
@@ -275,18 +358,32 @@ export const AchievementTypeSchema = borsh.rustEnum([
 export interface GameEvent {
   event_type: EventType;
   player: PublicKey;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   timestamp: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   block_height: number;
 }
 
 export const GameEventSchema = borsh.struct([
-  borsh.eventtype('event_type'),
+  EventTypeSchema('event_type'),
   borsh.publicKey('player'),
   borsh.i64('timestamp'),
   borsh.u64('block_height'),
 ]);
 
 
+/**
+ * WARNING: Some variants contain TypeScript 'number' types with precision limit of 2^53-1.
+ * Large values (e.g., Solana lamports) may lose precision during serialization.
+ */
 export type EventType =
   | { kind: 'PlayerCreated' }
   | { kind: 'ItemMinted'; item_id: number; rarity: Rarity }
@@ -306,7 +403,7 @@ export const EventTypeSchema = borsh.rustEnum([
   borsh.unit('PlayerCreated'),
   borsh.struct([
     borsh.u64('item_id'),
-    borsh.rarity('rarity'),
+    RaritySchema('rarity'),
   ], 'ItemMinted'),
   borsh.struct([
     borsh.u64('item_id'),
@@ -324,7 +421,7 @@ export const EventTypeSchema = borsh.rustEnum([
   ], 'ItemUpgraded'),
   borsh.struct([
     borsh.u64('item_id'),
-    borsh.consumableeffect('effect'),
+    ConsumableEffectSchema('effect'),
   ], 'ItemConsumed'),
   borsh.struct([
     borsh.u64('trade_id'),
@@ -342,19 +439,49 @@ export const EventTypeSchema = borsh.rustEnum([
     borsh.u16('new_level'),
   ], 'LevelUp'),
   borsh.struct([
-    borsh.achievementtype('achievement_type'),
+    AchievementTypeSchema('achievement_type'),
   ], 'AchievementUnlocked'),
 ]);
 
 
 export interface GameStats {
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_players: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_items_minted: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_trades_completed: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_items_crafted: number;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   total_gold_circulating: number;
   most_valuable_item?: PublicKey | undefined;
   highest_level_player?: PublicKey | undefined;
+  /**
+   * WARNING: TypeScript 'number' has precision limit of 2^53-1 (9,007,199,254,740,991).
+   * For Solana lamports or large values, ensure they stay within safe range.
+   * Values exceeding this limit will lose precision during serialization.
+   */
   last_updated: number;
 }
 

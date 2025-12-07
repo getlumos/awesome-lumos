@@ -2,6 +2,7 @@
 // DO NOT EDIT - Changes will be overwritten
 
 use anchor_lang::prelude::*;
+use solana_program::pubkey::Pubkey;
 
 #[account]
 pub struct VestingPool {
