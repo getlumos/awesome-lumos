@@ -46,7 +46,12 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Install LUMOS CLI
-        run: cargo install lumos-cli --locked
+        run: |
+          if ! command -v lumos &> /dev/null; then
+            cargo install lumos-cli --locked
+          else
+            echo "lumos CLI already installed: $(lumos --version)"
+          fi
 
       - name: Validate schema syntax
         run: |
