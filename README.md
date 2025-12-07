@@ -6,9 +6,17 @@ Curated collection of awesome LUMOS examples, full-stack applications, tutorials
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 [![LUMOS](https://img.shields.io/badge/LUMOS-Type--Safe%20Solana-9945FF.svg)](https://github.com/getlumos/lumos)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE-MIT)
 
-[LUMOS](https://github.com/getlumos/lumos) is a type-safe schema language and code generator that bridges TypeScript and Rust for Solana development. Write your data structures once, generate production-ready code for both languages with guaranteed Borsh serialization compatibility.
+## What is LUMOS?
+
+[LUMOS](https://github.com/getlumos/lumos) is a type-safe schema language and code generator that bridges TypeScript and Rust for Solana development.
+
+**The Problem:** Building full-stack Solana apps requires maintaining identical type definitions in both Rust (programs) and TypeScript (clients). Manual synchronization is error-prone and time-consuming.
+
+**The Solution:** Write your data structures once in `.lumos` syntax, and LUMOS automatically generates production-ready code for both languages with guaranteed Borsh serialization compatibility.
+
+**Stop writing the same types twice. Start building faster.**
 
 ---
 
