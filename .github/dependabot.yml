@@ -1,30 +1,9 @@
 version: 2
 updates:
-  # Rust dependencies (Cargo)
-  - package-ecosystem: "cargo"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "rust"
-    commit-message:
-      prefix: "chore(deps)"
-
-  # npm dependencies (for client examples)
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "npm"
-    commit-message:
-      prefix: "chore(deps)"
+  # NOTE: Cargo and npm are NOT configured at root level because:
+  # - Cargo.toml files are in examples/*/programs/*/ (Anchor workspaces)
+  # - package.json is only in examples/nft-marketplace/
+  # Examples use pinned versions for reproducibility - no auto-updates needed
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
