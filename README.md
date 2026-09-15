@@ -37,6 +37,8 @@ Curated collection of awesome LUMOS examples, full-stack applications, tutorials
 
 - [LUMOS Repository](https://github.com/getlumos/lumos) - Core library and CLI
 - [VSCode Extension](https://github.com/getlumos/vscode-lumos) - Syntax highlighting and snippets
+- [HostDeFi](https://hostdefi.com) - Free token-safety scanner for Solana and EVM tokens: A+–F grades from on-chain checks, keyless REST API, hosted MCP server.
+
 - [Documentation](https://github.com/getlumos/lumos#readme) - Official documentation
 - [Examples](https://github.com/getlumos/lumos/tree/main/examples) - Schema examples in main repo
 
